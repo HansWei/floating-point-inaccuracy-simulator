@@ -98,6 +98,16 @@ The zips are plain static files, so they also work on Newgrounds, Game Jolt (HTM
 upload), GitHub Pages (next section), Netlify or any web server. Portals such as Poki or CrazyGames
 additionally require their own SDK for ads and analytics, which this port does not include.
 
+Hosts that build from the repository must run the build and publish `dist/`, not
+`web/src/` (that folder holds templates with `{{TITLE}}` and `{{SCRIPTS}}` placeholders):
+
+- **Build command:** `python3 tools/build.py` (Python 3, standard library only)
+- **Output directory:** `dist`
+
+For **Tencent Cloud EdgeOne Pages** these settings are already in `edgeone.json`; import the
+repository and deploy. For Netlify, Vercel or Cloudflare Pages, enter them in the project's
+build settings.
+
 ## Publishing on GitHub
 
 `.github/workflows/publish.yml` does it all:

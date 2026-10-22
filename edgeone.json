@@ -1,0 +1,4 @@
+{
+  "buildCommand": "python3 tools/build.py",
+  "outputDirectory": "dist"
+}
