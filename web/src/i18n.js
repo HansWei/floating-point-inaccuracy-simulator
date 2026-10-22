@@ -52,7 +52,7 @@
 
     // labels without numbers
     "get 10^63 (one vigintillion) score to win": ["获得 10^63 分即可获胜", "consigue 10^63 puntos para ganar"],
-    "get 5000 score to win": ["获得 5000 分即可获胜", "consigue 5000 puntos para ganar"],
+    "get 1000 score to win": ["获得 1000 分即可获胜", "consigue 1000 puntos para ganar"],
     "u already won": ["你已经赢了", "ya ganaste"],
 
     // pop-ups from the game
@@ -113,6 +113,7 @@
       "第一次点击。你还会点很多很多很多次。",
       "haz clic por primera vez. lo harás muchas, muchísimas veces más."],
     "get to 1000 score without prestiging": ["不进行声望重置就达到 1000 分", "llega a 1000 puntos sin usar el prestigio"],
+    "get to 200 score without prestiging": ["不进行声望重置就达到 200 分", "llega a 200 puntos sin usar el prestigio"],
     "you have officially been permanently locked out of an achievement. we wont tell you what.": [
       "你已经正式永久错过了一个成就。我们不会告诉你是哪个。",
       "oficialmente te quedaste sin un logro para siempre. no te diremos cuál."],

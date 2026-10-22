@@ -12,7 +12,7 @@
     pyPow = P.pyPow, pyStr = P.pyStr;
   var S = root.PySave || (typeof require === "function" ? require("./savejson.js") : null);
 
-  var WIN_SCORE = 5000;
+  var WIN_SCORE = 1000;
 
   function DemoGame(hooks) {
     this.hooks = hooks || {};
@@ -83,7 +83,7 @@
       score: "score: " + pyStr(this.score),
       clickPower: "click power: " + pyStr(this.clickIncome()),
       scorePerSecond: "score per second: " + pyStr(this.passiveIncome()),
-      goal: "get 5000 score to win",
+      goal: "get 1000 score to win",
       progress: null,
       clickCost: pyStr(this.clickCost()),
       spsCost: pyStr(this.spsCost()),
@@ -247,11 +247,11 @@
       A("beginning of the end", "click for the first time. you will do this many, many more times.",
         clicks, function (c) { return c >= 1; }, zero, [0n, 0n, 0n], 0n),
       A("making progress", "10% of the way there",
-        score, function (s) { return s >= 500; }, zero, [0n, 0.05, 0.05], 0n),
+        score, function (s) { return s >= 100; }, zero, [0n, 0.05, 0.05], 0n),
       A("halfway there!", "get 50% progress",
-        score, function (s) { return s >= 2500; }, zero, [0n, 0n, 0.02], 1n),
-      A("time wasters: wasters of time", "get to 1000 score without prestiging",
-        score, function (s) { return s >= 1000 && g.lifetime_PP === 0n; },
+        score, function (s) { return s >= 500; }, zero, [0n, 0n, 0.02], 1n),
+      A("time wasters: wasters of time", "get to 200 score without prestiging",
+        score, function (s) { return s >= 200 && g.lifetime_PP === 0n; },
         function () { return -1n; }, [0n, 0n, 0n], 0n),
       A("lol", "you have officially been permanently locked out of an achievement. we wont tell you what.",
         function () { return g.lifetime_PP; }, function (pp) { return pp >= 1n; },

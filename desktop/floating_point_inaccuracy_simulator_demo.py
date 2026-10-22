@@ -36,7 +36,7 @@ achievements=[
     #same format as the full game:
     #[title, description, lambda: variable in question, lambda variable: quota for variable,
     #lambda : reward in score, [permanent click boost, sps boost, general boost], reward in PP, unlocked]
-    #goals are scaled down for the demo (win at 5000 score)
+    #goals are scaled down for the demo (win at 1000 score)
 
     ['the name of the game',
      'find out that computers aren\'t good at floating-point arithmetic',
@@ -59,25 +59,25 @@ achievements=[
     ['making progress',
      '10% of the way there',
      lambda: score,
-     lambda score: score>=500,
+     lambda score: score>=100,
      lambda score: 0,
      [0,0.05,0.05],
-     0, #no prestige points, so 'time wasters' (1000 score with no prestige points ever) stays possible
+     0, #no prestige points, so 'time wasters' (200 score with no prestige points ever) stays possible
      False
     ],
     ['halfway there!',
      'get 50% progress',
      lambda: score,
-     lambda score: score>=2500,
+     lambda score: score>=500,
      lambda score: 0,
      [0,0,0.02],
      1,
      False
     ],
     ['time wasters: wasters of time',
-     'get to 1000 score without prestiging',
+     'get to 200 score without prestiging',
      lambda: score,
-     lambda score: score>=1000 and lifetime_PP==0,
+     lambda score: score>=200 and lifetime_PP==0,
      lambda score: -1,
      [0,0,0],
      0,
@@ -302,7 +302,7 @@ def per_sec_update():
     score_label.config(text='score: '+str(score))
     screen.after(1000, per_sec_update)
     check_achievments()
-    if score >= 5000 and not won:
+    if score >= 1000 and not won:
         won=True
         messagebox.showinfo(message='yay u completed the demo of floating point inaccuracy simulator!')
 
@@ -403,7 +403,7 @@ score_label=Label(main_frame, text='score: '+str(score))
 increment_button=Button(main_frame, text='increment',command=increment_func)
 click_power_label=Label(main_frame, text='click power: '+str(click_power))
 sps_label=Label(main_frame, text='score per second: '+str(score_per_second))
-win_label=Label(main_frame,text='get 5000 score to win')
+win_label=Label(main_frame,text='get 1000 score to win')
 goto1=Button(main_frame, text='go to upgrade menu', command=lambda: goto(1))
 
 upgrade_frame=Frame(screen)
