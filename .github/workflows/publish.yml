@@ -1,0 +1,91 @@
+# Builds both games and publishes them on GitHub.
+#
+#   every push and pull request: build both games, run the Node smoke test, and keep the
+#     two itch.io zips as a workflow artifact (Actions tab, run page, "Artifacts");
+#   push to main (or a manual run on main): also deploy the site to GitHub Pages:
+#     <pages-url>/ (landing page), /full/ and /demo/;
+#   push of a tag v* (for example v1.0.0): also create a GitHub release with both zips.
+#
+# Pages needs Settings > Pages > Source set to "GitHub Actions". See README.md,
+# "Publishing on GitHub".
+#
+# The parity and browser tests are not run here: they compare against macOS Python, whose
+# float results differ slightly from Linux. Run them locally (README.md, "Tests").
+
+name: build and publish
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build both games
+        run: python3 tools/build.py
+      - name: Smoke test
+        run: node tests/smoke.js
+      - name: Keep the itch.io zips
+        uses: actions/upload-artifact@v4
+        with:
+          name: itch-zips
+          path: dist/*.zip
+          if-no-files-found: error
+      - name: Prepare the Pages site
+        run: |
+          mkdir -p _site
+          cp -R dist/index.html dist/full dist/demo _site/
+      - name: Upload the Pages site
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  pages:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: itch-zips
+          path: zips
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$TAG" zips/*.zip \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "floating point inaccuracy simulator $TAG" \
+            --notes "Web builds of both games. Each zip has index.html at its root: upload it to itch.io as an HTML game, or unzip it and open index.html. Play online: https://hanswei.github.io/floating-point-inaccuracy-simulator/"
