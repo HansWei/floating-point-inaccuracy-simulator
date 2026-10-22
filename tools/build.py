@@ -85,7 +85,7 @@ the computer holds it, rounding errors included.</p>
 <a class="play" href="full/"><strong>play the full game</strong><br>
 <small>reach 1e63 score; achievements, milestones and prestige upgrades</small></a>
 <a class="play" href="demo/"><strong>play the demo</strong><br>
-<small>a short version: win at 5000 score, with its own achievements</small></a>
+<small>a short version: win at 1000 score, with its own achievements</small></a>
 <p><small>Progress is saved in this browser. Use "export save" in the game to back it up.</small></p>
 </body>
 </html>

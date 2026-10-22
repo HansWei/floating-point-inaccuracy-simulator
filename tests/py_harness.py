@@ -308,8 +308,8 @@ def scripted_traces() -> list:
     demo_complete = (
         [{"op": "buy_click"}]  # fails: counts as "broke" and schedules the "take a break." check
         + [{"op": "click"}] * 3  # 0.1 + 0.1 + 0.1 = 0.30000000000000004
-        + [add("score", 1000.0), {"op": "tick"}]  # making progress, time wasters
-        + [add("score", 1500.0), {"op": "tick"}]  # halfway there (first prestige point), lol
+        + [add("score", 200.0), {"op": "tick"}]  # making progress, time wasters
+        + [add("score", 300.0), {"op": "tick"}]  # halfway there (first prestige point), lol
         + [add("prestige_points", 10), {"op": "tick"}]  # hoarder
         + [{"op": "pu_cheaper"}] * 7 + [{"op": "buy_sps"}, {"op": "tick"}]  # free sample
         + [add("total_clicks", 10000), {"op": "tick"}]  # carpal tunnel, filler text, autoclicker, cheater!

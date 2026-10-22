@@ -14,8 +14,9 @@ Two editions:
 
 - **full game** (`original/floating_point_inaccuracy_simulator.py`): win at 10^63 score, 24
   achievements plus 5 hidden ones, milestones, four prestige upgrades.
-- **demo** (`original/floating_point_inaccuracy_simulator_demo.py`): win at 5000 score.
-  The web demo also has 22 achievements, scaled down from the full game. They were added
+- **demo** (`original/floating_point_inaccuracy_simulator_demo.py`): the original is won at
+  5000 score; the web demo is won at **1000** score. The web demo also has 22 achievements,
+  scaled down from the full game. They were added
   to a desktop copy first (`desktop/floating_point_inaccuracy_simulator_demo.py`), which
   is the reference the web demo is tested against; see [Demo achievements](#demo-achievements).
 
@@ -192,20 +193,21 @@ flowchart LR
 ## Demo achievements
 
 The original demo has no achievements. The web demo adds the full game's system, scaled
-to a game that is won at 5000 score. The change was made in Python first, in
+to a game that is won at 1000 score. The change was made in Python first, in
 `desktop/floating_point_inaccuracy_simulator_demo.py` (a copy of the original demo plus
 the achievement code, started like the original with `python3 desktop/...`; the tests run
 it with a stand-in for Tkinter), so the web demo is tested against real Python like
 everything else. Without any achievement unlocked it plays
-exactly like the original demo (`test_demo_rules_unchanged_apart_from_achievements`).
+exactly like the original demo, apart from the lower win score
+(`test_demo_rules_unchanged_apart_from_achievements`).
 
 | achievement | goal | reward |
 |---|---|---|
 | the name of the game | score reaches 0.30000000000000004 (three clicks) | 1e-17 score |
 | beginning of the end | first click | |
-| making progress | 500 score | +5% passive, +5% all income |
-| halfway there! | 2500 score | +2% all income, 1 prestige point |
-| time wasters: wasters of time | 1000 score before earning any prestige point | -1 score |
+| making progress | 100 score | +5% passive, +5% all income |
+| halfway there! | 500 score | +2% all income, 1 prestige point |
+| time wasters: wasters of time | 200 score before earning any prestige point | -1 score |
 | lol | first prestige point earned | -0.1% all income |
 | hoarder | 10 prestige points at once | +1% clicking |
 | carpal tunnel syndrome | 1000 clicks | 10% of score, +1% passive |
@@ -226,9 +228,9 @@ exactly like the original demo (`test_demo_rules_unchanged_apart_from_achievemen
 
 Choices: the full game's achievements tied to 10^63 score, milestones, the sps prestige
 upgrade or 50 years of play were left out because the demo has none of those. "making
-progress" gives no prestige point, so "time wasters" stays possible: reaching 1000 score
-before the 492-second gift or the 1947th click takes about 4 clicks per second, which makes
-it a speed challenge (the full game's "lol" achievement tells players when they have missed
+progress" gives no prestige point, so "time wasters" stays possible: it needs 200 score
+before "halfway there!" (500 score), the 492-second gift or the 1947th click, each of which
+pays a prestige point, which makes it a small speed challenge (the full game's "lol" achievement tells players when they have missed
 it). The demo's labels show income including the boosts, and the "instant 3 minutes"
 prestige upgrade uses the boosted income, like the full game.
 

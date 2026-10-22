@@ -102,12 +102,20 @@ def test_every_demo_achievement_is_reached(traces):
     assert not missing, missing
 
 
-def test_demo_rules_unchanged_apart_from_achievements():
+def test_demo_rules_unchanged_apart_from_achievements(tmp_path):
     """With every achievement already unlocked (so none can fire or pay out), the desktop
-    demo plays exactly like the untouched original demo."""
+    demo plays exactly like the original demo, apart from its lower win score (1000, the
+    original's is 5000)."""
+    source = h.ORIGINAL_DEMO.read_text(encoding="utf-8")
+    for old, new in [("if score >= 5000 and not won:", "if score >= 1000 and not won:"),
+                     ("text='get 5000 score to win'", "text='get 1000 score to win'")]:
+        assert source.count(old) == 1, old
+        source = source.replace(old, new)
+    original_at_1000 = tmp_path / h.ORIGINAL_DEMO.name
+    original_at_1000.write_text(source, encoding="utf-8")
     base_vars = h.DEMO_VARS_ORIGINAL
     for seed in range(4):
-        reference = h.OriginalGame("demo", path=h.ORIGINAL_DEMO, variables=base_vars)
+        reference = h.OriginalGame("demo", path=original_at_1000, variables=base_vars)
         changed = h.OriginalGame("demo")
         for a in changed.ns["achievements"] + changed.ns["special_achievements"]:
             a[7] = True
