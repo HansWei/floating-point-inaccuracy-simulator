@@ -1,8 +1,8 @@
 # floating point inaccuracy simulator
 
 A simple and extremely long clicker game where every number is shown exactly as the
-computer stores it. Originally written in Python with Tkinter; this repository also has a
-browser version, ready for GitHub Pages, itch.io or any static web host.
+computer stores it. Originally written in Python with Tkinter by **PZ**; this repository
+also has a browser version, ready for GitHub Pages, itch.io or any static web host.
 
 **Play in the browser:** https://hanswei.github.io/floating-point-inaccuracy-simulator/
 (full game: [/full/](https://hanswei.github.io/floating-point-inaccuracy-simulator/full/),
@@ -284,3 +284,10 @@ tests/         py_harness.py (runs originals headless), replay.js, pytest suites
 .github/workflows/publish.yml   build, smoke test, GitHub Pages and Releases
 screenshots/   images for this README and the itch.io page
 ```
+
+## Copyright and credit
+
+Copyright (c) 2026 PZ. The game, its rules and its text were created by **PZ**, the author.
+Please acknowledge PZ as the author wherever you share, modify, port or republish the game,
+for example on a store page, in a release or in a fork's README. The code is shared under the
+terms in [LICENSE](LICENSE).
