@@ -129,14 +129,14 @@ publishing a change to the game logic (see [Tests](#tests)).
 
 ```mermaid
 flowchart LR
-  subgraph browser [index.html]
-    ui[ui.js: tabs, pop-up queue, 1 s tick, autosave] --> engine[engine-full.js / engine-demo.js: original rules]
-    engine --> pyfloat[pyfloat.js: Python int/float semantics and repr]
-    engine --> savejson[savejson.js: save.json read/write]
-    pyfloat --> powx[pow-exceptions.js]
+  subgraph browser ["index.html"]
+    ui["ui.js: tabs, pop-up queue, 1 s tick, autosave"] --> engine["engine-full.js / engine-demo.js: game rules"]
+    engine --> pyfloat["pyfloat.js: Python int/float semantics, repr, log"]
+    engine --> savejson["savejson.js: save.json read/write"]
+    pyfloat --> powx["pow-exceptions.js"]
   end
-  orig[original/*.py] -. same traces .-> parity[tests/test_parity.py]
-  engine -. replay.js .-> parity
+  orig["original/*.py and desktop/*.py"] -.->|"same steps"| parity["tests/test_parity.py"]
+  engine -.->|"tests/replay.js"| parity
 ```
 
 - **Python numbers in JavaScript** (`web/src/pyfloat.js`). Python ints are BigInt and
