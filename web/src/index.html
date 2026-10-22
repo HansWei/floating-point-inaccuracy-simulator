@@ -13,53 +13,56 @@
 <body data-edition="{{EDITION}}">
 <main class="app">
   <header>
-    <h1>{{TITLE}}</h1>
+    <h1 data-i18n>{{TITLE}}</h1>
     <nav class="tabs" role="tablist">
-      <button type="button" role="tab" data-goto="0">main</button>
-      <button type="button" role="tab" data-goto="1">upgrades</button>
-      <button type="button" role="tab" data-goto="2">prestige</button>
+      <button type="button" role="tab" data-goto="0" data-i18n>main</button>
+      <button type="button" role="tab" data-goto="1" data-i18n>upgrades</button>
+      <button type="button" role="tab" data-goto="2" data-i18n>prestige</button>
     </nav>
   </header>
 
   <section class="panel" data-panel="0" role="tabpanel">
     <p class="num big" data-view="score"></p>
-    <button type="button" class="primary" data-action="click">increment</button>
+    <button type="button" class="primary" data-action="click" data-i18n>increment</button>
     <p class="num" data-view="clickPower"></p>
     <p class="num" data-view="scorePerSecond"></p>
     <p data-view="goal"></p>
     <p class="num" data-view="progress"></p>
-    <button type="button" data-goto="1">go to upgrade menu</button>
+    <button type="button" data-goto="1" data-i18n>go to upgrade menu</button>
   </section>
 
   <section class="panel" data-panel="1" role="tabpanel" hidden>
     <p class="num" data-view="score"></p>
-    <button type="button" class="buy" data-action="buy_click">upgrade clicking<span class="num">cost: <b data-view="clickCost"></b></span></button>
-    <button type="button" class="buy" data-action="buy_sps">upgrade score per second<span class="num">cost: <b data-view="spsCost"></b></span></button>
-    <button type="button" data-cmd="save">save game</button>
-    <button type="button" data-goto="2">go to prestige menu</button>
-    <button type="button" data-goto="0">go to main menu</button>
+    <button type="button" class="buy" data-action="buy_click"><span data-i18n>upgrade clicking</span><span class="num"><span data-i18n>cost:</span> <b data-view="clickCost"></b></span></button>
+    <button type="button" class="buy" data-action="buy_sps"><span data-i18n>upgrade score per second</span><span class="num"><span data-i18n>cost:</span> <b data-view="spsCost"></b></span></button>
+    <button type="button" data-cmd="save" data-i18n>save game</button>
+    <button type="button" data-goto="2" data-i18n>go to prestige menu</button>
+    <button type="button" data-goto="0" data-i18n>go to main menu</button>
   </section>
 
   <section class="panel" data-panel="2" role="tabpanel" hidden>
     <button type="button" class="prestige" data-action="prestige" data-view="prestige"></button>
     <p class="num" data-view="prestigePoints"></p>
     <div class="grid" data-prestige-upgrades></div>
-    <button type="button" data-goto="0">go to main menu</button>
+    <button type="button" data-goto="0" data-i18n>go to main menu</button>
   </section>
 
   <footer>
     <p class="status" data-status role="status"></p>
     <div class="row">
-      <button type="button" class="small" data-cmd="export">export save</button>
-      <button type="button" class="small" data-cmd="import">import save</button>
-      <button type="button" class="small danger" data-cmd="reset">reset</button>
+      <button type="button" class="small" data-cmd="export" data-i18n>export save</button>
+      <button type="button" class="small" data-cmd="import" data-i18n>import save</button>
+      <button type="button" class="small danger" data-cmd="reset" data-i18n>reset</button>
+      <label class="lang"><span aria-hidden="true">&#127760;</span>
+        <select data-lang aria-label="language"></select></label>
     </div>
-    <p class="hint">space: increment &middot; 1 / 2 / 3: menus &middot; progress saves automatically in this browser</p>
+    <p class="hint" data-i18n>space: increment &middot; 1 / 2 / 3: menus &middot; progress saves automatically in this browser</p>
   </footer>
 </main>
 
 <div class="modal" data-modal hidden>
   <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+    <p class="badge" data-dialog-badge hidden></p>
     <h2 id="dialog-title" data-dialog-title></h2>
     <p class="message" data-dialog-text></p>
     <textarea data-dialog-input spellcheck="false" hidden></textarea>

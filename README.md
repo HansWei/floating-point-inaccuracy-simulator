@@ -42,7 +42,7 @@ python3 -m http.server 8765 --bind 127.0.0.1 --directory dist
 # then open http://127.0.0.1:8765/
 ```
 
-The build produces one self-contained `index.html` per edition (about 54 KB and 47 KB, no
+The build produces one self-contained `index.html` per edition (about 75 KB and 68 KB, no
 external requests), a zip for each, and `dist/index.html`, a landing page that links both
 editions when `dist/` is hosted as one site:
 
@@ -104,7 +104,7 @@ additionally require their own SDK for ads and analytics, which this port does n
 
 | when | what happens |
 |---|---|
-| every push and pull request | builds both editions, runs `tests/smoke.js`, keeps the two itch.io zips as a workflow artifact (run page, **Artifacts**) |
+| every push and pull request | builds both editions, runs `tests/smoke.js` and `tests/i18n_check.js`, keeps the two itch.io zips as a workflow artifact (run page, **Artifacts**) |
 | push to `main` | also deploys the site to GitHub Pages: the landing page, `/full/` and `/demo/` |
 | push of a tag `v*` | also creates a release with both zips attached |
 
@@ -125,12 +125,31 @@ The parity and browser tests are not run in the workflow, because they compare a
 macOS Python, whose float results differ slightly from Linux. Run them locally before
 publishing a change to the game logic (see [Tests](#tests)).
 
+## Languages
+
+The web versions can be played in **English, Chinese (中文) and Spanish (Español)**. Pick a
+language with the 🌐 menu at the bottom of the page; the choice is kept in the browser. A
+link can also choose it with `?lang=en`, `?lang=zh` or `?lang=es` (for example
+https://hanswei.github.io/floating-point-inaccuracy-simulator/full/?lang=zh). Without either,
+the game follows the browser's language and falls back to English.
+
+Only the words change. Numbers are always shown raw, exactly as in the original (that is the
+joke), and saves are the same in every language. The game rules keep producing the original
+English text, and `web/src/i18n.js` translates it just before it is shown, so the parity tests
+with the Python games are unaffected. To add a language, add a column to the `EXACT` and
+`PATTERNS` tables in `i18n.js` and an entry to `LANGUAGES`; `node tests/i18n_check.js` lists
+every text that still needs a translation.
+
+Achievement pop-ups carry a gold **"🏆 achievement unlocked!"** label (**"secret achievement
+unlocked!"** for the hidden ones), so they stand out from other messages.
+
 ## How the port works
 
 ```mermaid
 flowchart LR
   subgraph browser ["index.html"]
-    ui["ui.js: tabs, pop-up queue, 1 s tick, autosave"] --> engine["engine-full.js / engine-demo.js: game rules"]
+    ui["ui.js: tabs, pop-up queue, 1 s tick, autosave"] --> i18n["i18n.js: Chinese and Spanish text"]
+    ui --> engine["engine-full.js / engine-demo.js: game rules"]
     engine --> pyfloat["pyfloat.js: Python int/float semantics, repr, log"]
     engine --> savejson["savejson.js: save.json read/write"]
     pyfloat --> powx["pow-exceptions.js"]
@@ -210,6 +229,7 @@ python3 -m pip install pytest playwright      # playwright only for the browser 
 python3 tools/build.py
 python3 -m pytest -q tests                    # needs Node.js 16+ on PATH
 node tests/smoke.js                           # quick check, runs anywhere (used by CI)
+node tests/i18n_check.js                      # every text has a translation (used by CI)
 python3 tools/check_log_rounding.py           # optional, about a minute
 ```
 
@@ -228,9 +248,13 @@ python3 tools/check_log_rounding.py           # optional, about a minute
   imports a desktop `save.json`, rejects a save that loads but cannot run without touching
   the stored one, checks that a pop-up blocks the buttons behind it (mouse and keyboard),
   checks that a held key does not auto-click, checks a 320 px wide screen for sideways
-  scrolling, and fails on any console error.
+  scrolling in each language, checks the achievement label, switches language and opens
+  every dialog with no untranslated text, and fails on any console error.
 - `tests/smoke.js` plays 20,000 random actions in each engine with Node alone and checks
   that saves reload exactly. It needs neither Python nor a browser.
+- `tests/i18n_check.js` collects every achievement pop-up, every label from 20,000 random
+  actions per edition, and every page and dialog text, and checks that each has a Chinese
+  and a Spanish translation that keeps its numbers unchanged.
 
 ## Differences from the desktop originals
 
@@ -244,6 +268,8 @@ Intentional, and kept small:
   `run_clicks`). The original did not save them, so reloading could grant "free sample" or
   reset "take a break." progress. The desktop game ignores unknown keys, so saves still
   work in both directions.
+- **Languages and achievement label** (see [Languages](#languages)). The desktop games are
+  English only.
 - **The demo saves progress** (the original demo had no save) and has achievements (see
   [Demo achievements](#demo-achievements)).
 - **Pop-ups pause the game**, as they do in the original full game (its next tick waits
@@ -277,11 +303,13 @@ macOS results.
 ```
 original/      the two Tkinter games, unchanged (reference for the tests)
 desktop/       the demo with achievements as a Tkinter game (reference for the web demo)
-web/src/       index.html template, style.css, ui.js, engines, Python number layer
+web/src/       index.html template, style.css, ui.js, i18n.js (translations), engines,
+               Python number layer
 tools/         build.py (dist/ + zips + landing page), publish_itch.sh (butler),
                gen_pow_exceptions.py, check_log_rounding.py
-tests/         py_harness.py (runs originals headless), replay.js, pytest suites, smoke.js
-.github/workflows/publish.yml   build, smoke test, GitHub Pages and Releases
+tests/         py_harness.py (runs originals headless), replay.js, pytest suites, smoke.js,
+               i18n_check.js
+.github/workflows/publish.yml   build, smoke and translation tests, GitHub Pages and Releases
 screenshots/   images for this README and the itch.io page
 ```
 
