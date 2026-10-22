@@ -198,10 +198,13 @@
     storage = null;
   }
 
+  // The status line keeps its English text so a language switch can show it again.
+  var status = { text: "", warn: false };
   function setStatus(text, warn) {
+    status = { text: text, warn: !!warn };
     var el = $("[data-status]");
-    el.textContent = text;
-    el.classList.toggle("warn", !!warn);
+    el.textContent = text ? t(text) : "";
+    el.classList.toggle("warn", status.warn);
   }
 
   var statusTimer = 0;
@@ -217,7 +220,7 @@
       storage.setItem(edition.storageKey, game.toSaveText());
       return true;
     } catch (err) {
-      setStatus(t("Saving failed (" + err.name + "). Use \"export save\" to keep your progress."), true);
+      setStatus("Saving failed (" + err.name + "). Use \"export save\" to keep your progress.", true);
       return false;
     }
   }
@@ -247,7 +250,7 @@
     if (!loaded) {
       // Keep the unreadable save instead of overwriting it on the next autosave.
       storage.setItem(edition.storageKey + ".unreadable-" + Date.now(), text);
-      setStatus(t("Your saved game could not be read, so a new game was started."), true);
+      setStatus("Your saved game could not be read, so a new game was started.", true);
     }
     return loaded;
   }
@@ -256,7 +259,7 @@
   var game = loadStored() || new edition.Game(hooks);
   game.start();
   if (!storage) {
-    setStatus(t("This browser blocks storage for this page, so progress is lost on reload. Use \"export save\" to keep it."), true);
+    setStatus("This browser blocks storage for this page, so progress is lost on reload. Use \"export save\" to keep it.", true);
   }
 
   function replaceGame(next) {
@@ -324,6 +327,7 @@
     langSelect.value = lang;
     langSelect.setAttribute("aria-label", t("language"));
     i18nEls.forEach(function (el) { setText(el, t(el.i18nKey)); });
+    setStatus(status.text, status.warn);
     render();
   }
 
@@ -365,7 +369,7 @@
       return;
     }
     if (e.ctrlKey || e.metaKey || e.altKey) return;
-    var onControl = /^(BUTTON|TEXTAREA|INPUT|A)$/.test(e.target.tagName);
+    var onControl = /^(BUTTON|TEXTAREA|INPUT|SELECT|A)$/.test(e.target.tagName);
     if (e.key === " " && !onControl) {
       e.preventDefault();
       game.press("click");
@@ -388,13 +392,13 @@
       a.remove();
       setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
     } catch (err) {
-      flashStatus(t("Download is blocked here; copy the text instead."));
+      flashStatus("Download is blocked here; copy the text instead.");
     }
   }
 
   var commands = {
     save: function () {
-      if (save()) flashStatus(t("saved"));
+      if (save()) flashStatus("saved");
     },
     export: function () {
       var text = game.toSaveText();
@@ -433,7 +437,7 @@
               return false;
             }
             replaceGame(next);
-            flashStatus(t("save imported"));
+            flashStatus("save imported");
           }],
           ["choose file", function () {
             var picker = document.createElement("input");
@@ -460,7 +464,7 @@
           ["cancel", null],
           ["delete my progress", function () {
             replaceGame(new edition.Game(hooks));
-            flashStatus(t("new game started"));
+            flashStatus("new game started");
           }, "danger"],
         ],
       });

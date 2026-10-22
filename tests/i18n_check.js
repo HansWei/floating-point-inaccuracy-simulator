@@ -78,7 +78,7 @@ const build = fs.readFileSync(path.join(root, "tools", "build.py"), "utf8");
 for (const m of build.matchAll(/"title": "([^"]+)"/g)) fixed.add(m[1]);
 const ui = fs.readFileSync(path.join(src, "ui.js"), "utf8");
 const UI_PATTERNS = [
-  /\bt\("((?:[^"\\]|\\.)*)"\)/g, // t("...")
+  /\b(?:t|setStatus|flashStatus)\("((?:[^"\\]|\\.)*)"[,)]/g, // t("..."), status lines
   /\[\s*"((?:[^"\\]|\\.)*)",\s*(?:function|null)/g, // dialog buttons
   /\["pu_\w+", "((?:[^"\\]|\\.)*)"\]/g, // prestige upgrades
   /importHint: "((?:[^"\\]|\\.)*)"/g,
@@ -90,7 +90,7 @@ const UI_PATTERNS = [
 for (const re of UI_PATTERNS) {
   for (const m of ui.matchAll(re)) fixed.add(JSON.parse('"' + m[1] + '"'));
 }
-// t("Saving failed (" + err.name + ") ...") is built at run time; check one real example.
+// "Saving failed (" + err.name + ") ..." is built at run time; check one real example.
 fixed.delete("Saving failed (");
 dynamic.add('Saving failed (QuotaExceededError). Use "export save" to keep your progress.');
 

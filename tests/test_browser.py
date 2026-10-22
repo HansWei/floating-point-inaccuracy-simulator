@@ -401,6 +401,30 @@ def test_language_from_address_and_browser(browser, server):
     context.close()
 
 
+
+def test_space_on_language_menu_does_not_click(page, server):
+    open_paused(page, f"{server}/full/index.html")
+    dismiss_all(page)
+    page.locator("[data-lang]").focus()
+    page.keyboard.press(" ")
+    assert page.evaluate("fpis.game.total_clicks") == 0
+    assert not page.locator("[data-modal]").is_visible()
+
+
+def test_storage_warning_follows_the_language(page, server):
+    page.add_init_script("""Object.defineProperty(window, "localStorage", {get() {
+        throw new DOMException("blocked", "SecurityError"); }});""")
+    page.goto(f"{server}/full/index.html")
+    page.wait_for_function("window.fpis !== undefined")
+    dismiss_all(page)
+    status = page.locator("[data-status]")
+    assert "blocks storage" in status.text_content()
+    page.locator("[data-lang]").select_option("es")
+    assert status.text_content().startswith("este navegador")
+    assert "warn" in status.get_attribute("class")
+    page.locator("[data-lang]").select_option("en")
+    assert "blocks storage" in status.text_content()
+
 def test_i18n_check_passes():
     import subprocess
     root = pathlib.Path(__file__).resolve().parent.parent
