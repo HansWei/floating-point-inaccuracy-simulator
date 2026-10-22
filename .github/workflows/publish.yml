@@ -1,7 +1,8 @@
 # Builds both games and publishes them on GitHub.
 #
-#   every push and pull request: build both games, run the Node smoke test, and keep the
-#     two itch.io zips as a workflow artifact (Actions tab, run page, "Artifacts");
+#   every push and pull request: build both games, run the Node smoke and translation
+#     tests, and keep the two itch.io zips as a workflow artifact (Actions tab, run page,
+#     "Artifacts");
 #   push to main (or a manual run on main): also deploy the site to GitHub Pages:
 #     <pages-url>/ (landing page), /full/ and /demo/;
 #   push of a tag v* (for example v1.0.0): also create a GitHub release with both zips.
@@ -40,6 +41,8 @@ jobs:
         run: python3 tools/build.py
       - name: Smoke test
         run: node tests/smoke.js
+      - name: Translation check
+        run: node tests/i18n_check.js
       - name: Keep the itch.io zips
         uses: actions/upload-artifact@v4
         with:

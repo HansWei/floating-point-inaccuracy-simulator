@@ -102,7 +102,7 @@ def browser():
 
 @pytest.fixture
 def page(browser):
-    context = browser.new_context(viewport={"width": 640, "height": 720})
+    context = browser.new_context(viewport={"width": 640, "height": 720}, locale="en-US")
     page = context.new_page()
     errors: list = []
     page.on("pageerror", lambda e: errors.append(str(e)))
@@ -301,15 +301,107 @@ def test_held_key_does_not_auto_click(page, server):
     assert page.evaluate("fpis.game.total_clicks") == 1
 
 
+@pytest.mark.parametrize("lang", ["en", "zh", "es"])
 @pytest.mark.parametrize("kind", ["full", "demo"])
-def test_narrow_screen_has_no_sideways_scroll(browser, server, kind):
-    context = browser.new_context(viewport={"width": 320, "height": 640}, is_mobile=True,
+def test_narrow_screen_has_no_sideways_scroll(browser, server, kind, lang):
+    context = browser.new_context(viewport={"width": 320, "height": 640}, is_mobile=True, locale="en-US",
                                   has_touch=True)
     page = context.new_page()
-    page.goto(f"{server}/{kind}/index.html")
+    page.goto(f"{server}/{kind}/index.html?lang={lang}")
     page.wait_for_function("window.fpis !== undefined")
     for panel in range(3):
         page.evaluate(f"() => document.querySelector('.tabs [data-goto=\"{panel}\"]').click()")
         assert page.evaluate("document.documentElement.scrollWidth") <= 320
-        shot(page, f"{kind}-mobile-{panel}")
+        shot(page, f"{kind}-{lang}-mobile-{panel}")
     context.close()
+
+
+@pytest.mark.parametrize("kind", ["full", "demo"])
+def test_achievement_pop_up_says_it_is_an_achievement(page, server, kind):
+    open_paused(page, f"{server}/{kind}/index.html")
+    dismiss_all(page)
+    badge = page.locator("[data-dialog-badge]")
+    page.locator('[data-action="click"]').click()
+    assert page.locator("[data-dialog-title]").text_content() == "beginning of the end"
+    assert badge.is_visible() and badge.text_content() == "achievement unlocked!"
+    assert "achievement" in page.locator(".dialog").get_attribute("class")
+    shot(page, f"{kind}-achievement-badge")
+    dismiss_all(page)
+    page.locator('.tabs [data-goto="2"]').click()
+    page.locator('[data-action="prestige"]').click()
+    assert page.locator("[data-dialog-title]").text_content() == "why?"
+    assert badge.text_content() == "secret achievement unlocked!"
+    dismiss_all(page)
+    page.locator('[data-cmd="reset"]').click()  # not an achievement: no badge
+    assert page.locator("[data-modal]").is_visible() and not badge.is_visible()
+    assert "achievement" not in page.locator(".dialog").get_attribute("class")
+
+
+LANG_CASES = {
+    "zh": {"html": "zh-Hans", "h1": "浮点数误差模拟器", "tab": "升级", "score": "分数：",
+           "title": "终结的开始", "badge": "成就解锁！", "ok": "好", "load": "载入"},
+    "es": {"html": "es", "h1": "simulador de imprecisión de coma flotante", "tab": "mejoras",
+           "score": "puntos: ", "title": "el principio del fin", "badge": "¡logro desbloqueado!",
+           "ok": "vale", "load": "cargar"},
+}
+
+
+@pytest.mark.parametrize("lang", sorted(LANG_CASES))
+@pytest.mark.parametrize("kind", ["full", "demo"])
+def test_language_switch(page, server, kind, lang):
+    want = LANG_CASES[lang]
+    open_paused(page, f"{server}/{kind}/index.html")
+    dismiss_all(page)
+    page.locator("[data-lang]").select_option(lang)
+    assert page.evaluate("document.documentElement.lang") == want["html"]
+    if kind == "full":
+        assert page.locator("h1").text_content() == want["h1"]
+        assert page.title() == want["h1"]
+    assert page.locator('.tabs [data-goto="1"]').text_content() == want["tab"]
+    number = page.evaluate("fpis.game.view().score").split(": ", 1)[1]  # never localized
+    assert page.locator('[data-panel="0"] [data-view="score"]').text_content() == want["score"] + number
+    page.locator('[data-action="click"]').click()
+    assert page.locator("[data-dialog-title]").text_content() == want["title"]
+    assert page.locator("[data-dialog-badge]").text_content() == want["badge"]
+    assert page.locator("[data-dialog-buttons] button").first.text_content() == want["ok"]
+    shot(page, f"{kind}-{lang}-achievement")
+    dismiss_all(page)
+    # Every dialog and page text has a translation (misses fall back to English and are listed).
+    for cmd in ["export", "import", "reset"]:
+        page.locator(f'[data-cmd="{cmd}"]').click()
+        if cmd == "import":
+            page.locator("[data-dialog-input]").fill("not a save")
+            page.locator("[data-dialog-buttons] button", has_text=want["load"]).click()
+        # Close without acting: "close" (export), "cancel" (import), "cancel" first (reset).
+        page.locator("[data-dialog-buttons] button").nth(0 if cmd == "reset" else -1).click()
+        dismiss_all(page)
+    for panel in range(3):
+        page.locator(f'.tabs [data-goto="{panel}"]').click()
+    assert page.evaluate("fpis.missing") == []
+    # The game state is untouched by the language, and the choice is kept across reloads.
+    assert page.evaluate("fpis.game.total_clicks") == 1
+    page.reload()
+    page.wait_for_function("window.fpis !== undefined")
+    assert page.evaluate("fpis.lang") == lang
+    assert page.locator("[data-lang]").input_value() == lang
+
+
+def test_language_from_address_and_browser(browser, server):
+    context = browser.new_context(locale="es-ES")
+    page = context.new_page()
+    page.goto(f"{server}/full/index.html")
+    page.wait_for_function("window.fpis !== undefined")
+    assert page.evaluate("fpis.lang") == "es"
+    page.goto(f"{server}/full/index.html?lang=zh")
+    page.wait_for_function("window.fpis !== undefined")
+    assert page.evaluate("fpis.lang") == "zh"
+    page.goto(f"{server}/full/index.html?lang=xx")  # unknown: browser language
+    page.wait_for_function("window.fpis !== undefined")
+    assert page.evaluate("fpis.lang") == "es"
+    context.close()
+
+
+def test_i18n_check_passes():
+    import subprocess
+    root = pathlib.Path(__file__).resolve().parent.parent
+    subprocess.run(["node", str(root / "tests" / "i18n_check.js")], check=True)

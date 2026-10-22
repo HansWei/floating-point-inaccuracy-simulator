@@ -25,12 +25,12 @@ DIST = ROOT / "dist"
 EDITIONS = {
     "full": {
         "title": "floating point inaccuracy simulator",
-        "scripts": ["pow-exceptions.js", "pyfloat.js", "savejson.js", "engine-full.js", "ui.js"],
+        "scripts": ["pow-exceptions.js", "pyfloat.js", "savejson.js", "engine-full.js", "i18n.js", "ui.js"],
         "zip": "floating-point-inaccuracy-simulator-web.zip",
     },
     "demo": {
         "title": "floating point inaccuracy simulator (demo)",
-        "scripts": ["pow-exceptions.js", "pyfloat.js", "savejson.js", "engine-demo.js", "ui.js"],
+        "scripts": ["pow-exceptions.js", "pyfloat.js", "savejson.js", "engine-demo.js", "i18n.js", "ui.js"],
         "zip": "floating-point-inaccuracy-simulator-demo-web.zip",
     },
 }
